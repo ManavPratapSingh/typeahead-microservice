@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Search Typeahead System — real-time autocomplete powered by Redis and PostgreSQL" />
+  <title>Search Typeahead</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="backdrop"></div>
+
+  <main class="container">
+    <div class="hero">
+      <h1 class="title">Search <span class="gradient-text">Typeahead</span></h1>
+      <p class="subtitle">Real-time autocomplete · Redis read path · PostgreSQL write path</p>
+    </div>
+
+    <div class="search-wrapper" id="search-wrapper">
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          type="text"
+          id="search-input"
+          class="search-input"
+          placeholder="Start typing to search products…"
+          autocomplete="off"
+          spellcheck="false"
+        />
+        <div class="spinner" id="spinner"></div>
+      </div>
+
+      <ul class="suggestions-list" id="suggestions-list"></ul>
+    </div>
+
+    <div class="stats" id="stats"></div>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>

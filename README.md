@@ -70,25 +70,34 @@ The background sync worker runs on a configurable interval ($t = 120$ seconds) t
 * Docker & Docker Compose
 * Node.js (v18+)
 
-### 1. Spin up Databases
+### 1. Install Dependencies & Setup Environment
+Install the Node.js packages and configure your local environment settings:
+```bash
+npm install
+# Copy the example environment template
+cp .env.example .env  # Linux/macOS
+copy .env.example .env # Windows
+```
+
+### 2. Spin up Databases
 Runs PostgreSQL on port `5433` (to avoid conflict with local postgres on 5432) and Redis on port `6379`:
 ```bash
 docker-compose up -d
 ```
 
-### 2. Initialize Database Schema
+### 3. Initialize Database Schema
 Creates the `search_frequencies` table and performance index:
 ```bash
 npm run db:init
 ```
 
-### 3. Seed Amazon Product Dataset
+### 4. Seed Amazon Product Dataset
 Generates and bulk inserts 500 unique Amazon-style products with randomized review counts:
 ```bash
 npm run seed
 ```
 
-### 4. Run Development Server
+### 5. Run Development Server
 ```bash
 npm run dev
 ```

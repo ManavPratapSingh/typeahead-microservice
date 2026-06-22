@@ -14,7 +14,7 @@ export const config = {
   },
 
   // Redis
-  redisUrl: process.env.REDIS_URL || "redis://localhost:6379",
+  redisShards: (process.env.REDIS_SHARDS || "redis://localhost:6379/0,redis://localhost:6379/1,redis://localhost:6379/2").split(","),
 
   // Hybrid sampling thresholds
   samplingPerQueryX: parseInt(process.env.SAMPLING_PER_QUERY_X || "5", 10),

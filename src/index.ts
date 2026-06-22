@@ -10,6 +10,7 @@ import { connectRedis } from "./db/redis";
 import { startSyncWorker } from "./services/sync-worker";
 import suggestRouter from "./routes/suggest";
 import searchRouter from "./routes/search";
+import trendingRouter from "./routes/trending";
 
 async function main(): Promise<void> {
   const app = express();
@@ -23,6 +24,7 @@ async function main(): Promise<void> {
   // ── API Routes ──
   app.use("/suggest", suggestRouter);
   app.use("/search", searchRouter);
+  app.use("/trending", trendingRouter);
 
   // ── Connect to Redis ──
   await connectRedis();

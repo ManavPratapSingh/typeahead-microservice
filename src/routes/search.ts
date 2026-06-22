@@ -20,7 +20,7 @@ router.post("/", async (req: Request, res: Response) => {
 
   try {
     await sampler.record(query);
-    res.json({ status: "ok", query: query.trim().toLowerCase() });
+    res.json({ message: "searched" });
   } catch (err) {
     console.error("[search] Error:", err);
     res.status(500).json({ error: "Internal server error" });

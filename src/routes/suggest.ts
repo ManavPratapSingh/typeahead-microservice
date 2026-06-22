@@ -6,7 +6,7 @@
  * If the prefix key doesn't exist, returns an empty array immediately.
  */
 import { Router, Request, Response } from "express";
-import { redisClient } from "../db/redis";
+import { getRedisClientForPrefix } from "../db/redis";
 
 const router = Router();
 
@@ -21,7 +21,8 @@ router.get("/", async (req: Request, res: Response) => {
   }
 
   try {
-    const cached = await redisClient.get(`prefix:${prefix}`);
+    const client = getRedisClientForPrefix(prefix);
+    const cached = await client.get(`prefix:${prefix}`);
 
     const suggestions: string[] = cached ? JSON.parse(cached) : [];
 

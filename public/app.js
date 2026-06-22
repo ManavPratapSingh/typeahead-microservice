@@ -15,6 +15,8 @@
   const spinner = document.getElementById("spinner");
   const stats = document.getElementById("stats");
   const wrapper = document.getElementById("search-wrapper");
+  const trendingSection = document.getElementById("trending-section");
+  const trendingList = document.getElementById("trending-list");
 
   // ── State ──
   let debounceTimer = null;
@@ -140,10 +142,41 @@
   }
 
   // ── Select a suggestion: populate input + fire POST /search ──
+  // ── Show toast notification ──
+  function showToast(message) {
+    let container = document.getElementById("toast-container");
+    if (!container) {
+      container = document.createElement("div");
+      container.id = "toast-container";
+      container.className = "toast-container";
+      document.body.appendChild(container);
+    }
+
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.textContent = message;
+    container.appendChild(toast);
+
+    // Trigger animate-in
+    setTimeout(() => {
+      toast.classList.add("show");
+    }, 10);
+
+    // Animate out and remove
+    setTimeout(() => {
+      toast.classList.remove("show");
+      setTimeout(() => {
+        toast.remove();
+      }, 300);
+    }, 3000);
+  }
+
+  // ── Select a suggestion: populate input + fire POST /search ──
   async function selectSuggestion(query) {
     input.value = query;
     closeSuggestions();
     stats.textContent = `Searched: "${query}"`;
+    showToast(`searched ${query}`);
 
     try {
       await fetch("/search", {
@@ -196,4 +229,52 @@
       closeSuggestions();
     }
   });
+
+  // ── Fetch trending searches on page load ──
+  async function fetchTrending() {
+    try {
+      const res = await fetch("/trending");
+      const data = await res.json();
+      const trending = data.trending || [];
+
+      trendingList.innerHTML = "";
+
+      if (trending.length === 0) {
+        trendingSection.style.display = "none";
+        return;
+      }
+
+      trending.forEach((item) => {
+        const li = document.createElement("li");
+        li.className = "trending-item";
+
+        const querySpan = document.createElement("span");
+        querySpan.className = "trending-item-query";
+        querySpan.textContent = item.query;
+
+        const freqSpan = document.createElement("span");
+        freqSpan.className = "trending-item-freq";
+        freqSpan.textContent = Number(item.frequency).toLocaleString() + " hits";
+
+        li.appendChild(querySpan);
+        li.appendChild(freqSpan);
+
+        // Clicking a trending item searches for it
+        li.addEventListener("click", () => selectSuggestion(item.query));
+
+        trendingList.appendChild(li);
+      });
+
+      // Animate section in
+      setTimeout(() => {
+        trendingSection.classList.add("visible");
+      }, 100);
+    } catch (err) {
+      console.error("Failed to fetch trending:", err);
+      trendingSection.style.display = "none";
+    }
+  }
+
+  // Fire once on page load
+  fetchTrending();
 })();

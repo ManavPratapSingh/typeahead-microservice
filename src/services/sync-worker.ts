@@ -14,7 +14,7 @@
  *      pipeline (MSET-style).
  */
 import { pool } from "../db/postgres";
-import { redisClient } from "../db/redis";
+import { getRedisClientForPrefix } from "../db/redis";
 import { config } from "../config";
 
 /**
@@ -81,13 +81,29 @@ async function runSyncCycle(): Promise<void> {
     }
 
     // ── Step 5: Atomic Redis Pipeline Write ──────────────────────────────
-    const pipeline = redisClient.multi();
+    // Group prefix mappings by their designated shard client
+    const shardGroups = new Map<ReturnType<typeof getRedisClientForPrefix>, { prefix: string; suggestions: string[] }[]>();
 
     for (const [prefix, suggestions] of top5Map) {
-      pipeline.set(`prefix:${prefix}`, JSON.stringify(suggestions));
+      const client = getRedisClientForPrefix(prefix);
+      let list = shardGroups.get(client);
+      if (!list) {
+        list = [];
+        shardGroups.set(client, list);
+      }
+      list.push({ prefix, suggestions });
     }
 
-    await pipeline.exec();
+    // Execute pipelined transactions for each shard in parallel
+    const execPromises = Array.from(shardGroups.entries()).map(([client, items]) => {
+      const pipeline = client.multi();
+      for (const item of items) {
+        pipeline.set(`prefix:${item.prefix}`, JSON.stringify(item.suggestions));
+      }
+      return pipeline.exec();
+    });
+
+    await Promise.all(execPromises);
 
     const elapsed = Date.now() - t0;
     console.log(
